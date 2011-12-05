@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <title>Edelweiss Alpha Counter for Radon Monitoring</title>
+  <link type="text/css" href="css/bluesmooth/jquery-ui-1.8.16.custom.css" rel="stylesheet" />	
+
+  <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+  <script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
+  <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+  <script type="text/javascript" src="js/jquery.couch.js"></script>
+  <script type="text/javascript" src="js/index.js"></script>
+  <script type="text/javascript" src="js/jquery.placehold-0.3.min.js"></script>      
+  <script type="text/javascript" src="js/jquery.validate.min.js"></script>
+  <script type="text/javascript" src="js/additional-methods.min.js"></script>
+  <script type="text/javascript" src="js/jquery-ui-datetimepicker.js"></script>
+  <script type="text/javascript" src="js/jquery-ui-sliderextension.js"></script>
+  <script src="script/highcharts.js" type="text/javascript"></script>
+  <script src="script/themes/grid.js" type="text/javascript"></script> 
+  <script src="script/modules/exporting.js" type="text/javascript"></script>
+  <script src="script/highslide/highslide-full.min.js" type="text/javascript"></script>
+  <script src="script/highslide/highslide.config.js" type="text/javascript"></script>
+
+  <link rel="stylesheet" type="text/css" href="css/style.css"/>	
+  <link rel="stylesheet" type="text/css" href="css/highslide.css" />
+  
+</head>
+
+<body>
+
+  <div id="header"><img src="images/edelweiss.jpg" width="200"></img> <img src="images/KIT-Logo.png" width="180" align="right"></img>
+    <h1>Edelweiss Alpha Counter for Radon Monitoring</h1></div>
+
+<table class="input-details">
+	<tr>
+	  <td>
+		<div class="input-row">
+	         <label class="input-label">Start Date</label>
+	         <input id="idate" name="idate" placeholder="month/day/year" class="input-box ui-widget-content ui-corner-all" style="width:150px"/>
+	    </div>
+
+	    <br>
+		<div class="input-row">
+	         <label class="input-label">End Date</label>
+	         <input id="fdate" name="fdate" placeholder="month/day/year" class="input-box ui-widget-content ui-corner-all" style="width:150px"/>
+	    </div>
+	</td>
+	<td>
+			<div class="input-row">
+		         <label class="input-label">Low Energy Threshold [ADC]</label>
+		         <input id="lowE" name="lowE" placeholder="0" value = "0" class="input-box ui-widget ui-widget-content ui-corner-all" style="width:150px"/>
+		    </div>
+
+		    <br>
+			<div class="input-row">
+		         <label class="input-label">High Energy Threshold [ADC]</label>
+		         <input id="highE" name="highE" placeholder="4100" value="4100" class="input-box ui-widget ui-widget-content ui-corner-all" style="width:150px"/>
+		    </div>
+	</td>
+
+</table>
+
+	
+
+
+	<br>
+	<div class="button-row">
+	<button id="button-plot"  onclick="javascript:plot();">Plot</button>
+	</div>
+	<br>
+	<div class="download-row">
+	<a id="download-link" >Download Data</a>
+	</div>
+	
+	<br>
+	<div id="chart" style="width: 800px; height: 400px; margin: 0 auto"></div>
+	<div id="reporting" style="position:relative; left: 100px; bottom: 350px; font: 12px Arial, Verdana; color: #666;"></div>
+	
+	<div id="countsperday" style="width: 800px; height: 400px; margin: 0 auto"></div>
+	
+</body>
+
+</html>
