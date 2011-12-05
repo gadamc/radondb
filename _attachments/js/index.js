@@ -3,8 +3,8 @@ var appName = window.location.pathname.split("/")[3];
 var db = $.couch.db(dbname);
 var hist = new Array();
 var today = new Date();
-var twoMonthsAgo = new Date();
-twoMonthsAgo.setDate(today.getDate() - 60);
+var lastMonth = new Date();
+lastMonth.setDate(today.getDate() - 30);
 
 // ____________________________________________________________________________________
 $(document).ready(function(){
@@ -17,9 +17,11 @@ $(document).ready(function(){
   $(function() {
     
         $('#idate').datetimepicker({
-          numberOfMonths: 3,
+          numberOfMonths: 2,
           showButtonPanel: true,
-          defaultDate: twoMonthsAgo,
+          changeMonth: true,
+          changeYear: true,
+          defaultDate: lastMonth,
           addSliderAccess: true,
           sliderAccessArgs: { touchonly: false },
           onClose: function(dateText, inst) {
@@ -40,9 +42,11 @@ $(document).ready(function(){
             }
         });
         $('#fdate').datetimepicker({
-          numberOfMonths: 3,
+          numberOfMonths: 2,
           showButtonPanel: true,
           defaultDate: today,
+          changeMonth: true,
+          changeYear: true,
           addSliderAccess: true,
           sliderAccessArgs: { touchonly: false },
             onClose: function(dateText, inst) {
