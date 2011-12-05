@@ -143,7 +143,7 @@ function plot() {
                                   },
                                   events: {
                                       mouseOut: function() {                        
-                                          $reporting.empty();
+                                          $('#reporting').empty();
                                       }
                                   }
                    }
