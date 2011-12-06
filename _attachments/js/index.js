@@ -199,7 +199,7 @@ function setUpDownloadLink() {
   var endDate = Date.parse($("#fdate").val())/1000.0;
   var lowE = parseInt($("#lowE").val());
   var highE = parseInt($("#highE").val());
-  document.getElementById("download-link").href = "_list/hist/bydate?reduce=false&startkey="+startDate+"&endkey="+endDate+"&download=true"+"&lowE="+lowE+"&highE"+highE;
+  document.getElementById("download-link").href = "_list/hist/bydate?reduce=false&startkey="+startDate+"&endkey="+endDate+"&download=true"+"&lowE="+lowE+"&highE="+highE;
      
 
 }
