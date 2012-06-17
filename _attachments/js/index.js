@@ -5,6 +5,11 @@ var hist = new Array();
 var today = new Date();
 var lastMonth = new Date();
 lastMonth.setDate(today.getDate() - 30);
+var chart;
+var options;
+var now = new Date();
+var tenDaysAgo=new Date();
+tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
 
 // ____________________________________________________________________________________
 $(document).ready(function(){
@@ -13,7 +18,30 @@ $(document).ready(function(){
 
  $( "#button-plot" ).button();
  $(".download-row").hide();
- 
+ // $( "#efficiencySlider" ).slider({
+ //   animate: true,
+ //   step: 0.1,
+ //   min:90,
+ //   max: 110,
+ //   value: 98.7,
+ //   slide: function( event, ui ) {
+ //      $( "#efficienyValue" ).val( ui.value );
+ //    }
+ // });
+ // $( "#efficienyValue" ).val( $( "#efficiencySlider" ).slider( "value"));
+ // 
+ // $( "#adcSlider" ).slider({
+ //   range: true,
+ //   min: 0,
+ //   max: 4100,
+ //   values: [ 2000, 2275 ],
+ //   slide: function( event, ui ) {
+ //     $( "#adcrange" ).val(  ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+ //   }
+ // });
+ // $( "#adcrange" ).val( $( "#adcSlider" ).slider( "values", 0 ) +
+ // " -"  + $( "#adcSlider" ).slider( "values", 1 ) );
+
   $(function() {
     
         $('#idate').datetimepicker({
@@ -41,6 +69,7 @@ $(document).ready(function(){
                 $('#fdate').datetimepicker('option', 'minDate', new Date(start.getTime()));
             }
         });
+        
         $('#fdate').datetimepicker({
           numberOfMonths: 2,
           showButtonPanel: true,
@@ -66,10 +95,15 @@ $(document).ready(function(){
                 $('#idate').datetimepicker('option', 'maxDate', new Date(end.getTime()) );
             }
         });
+  
+        $('#fdate').datetimepicker('setDate', now );
+        $('#idate').datetimepicker('setDate', tenDaysAgo );
         
+        plot();
   });
    
-   
+  
+ 
 });
 
 // ____________________________________________________________________________________
@@ -79,8 +113,8 @@ function plot() {
    var startDate = Date.parse($("#idate").val())/1000.0;
    var endDate = Date.parse($("#fdate").val())/1000.0;
   
-   var chart;
-    var options = { 
+   
+   options = { 
        chart: {
           renderTo: 'chart',
           zoomType: 'xy',
