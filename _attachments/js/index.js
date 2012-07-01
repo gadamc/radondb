@@ -212,7 +212,6 @@ function plot() {
               setUpDownloadLink(); 
           },
           error: function(req, textStatus, errorThrown){
-            alert('Error '+ textStatus);
             $("#chart").html("woops...");
             $('#button-plot').removeAttr("disabled").removeClass( 'ui-state-disabled' );
             
