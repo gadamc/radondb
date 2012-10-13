@@ -8,8 +8,8 @@ lastMonth.setDate(today.getDate() - 30);
 var chart;
 var options;
 var now = new Date();
-var tenDaysAgo=new Date();
-tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+var someDaysInThePast=new Date();
+someDaysInThePast.setDate(someDaysInThePast.getDate() - 2);
 
 // ____________________________________________________________________________________
 $(document).ready(function(){
@@ -108,7 +108,7 @@ $(document).ready(function(){
         });
   
         $('#fdate').datetimepicker('setDate', now );
-        $('#idate').datetimepicker('setDate', tenDaysAgo );
+        $('#idate').datetimepicker('setDate', someDaysInThePast );
         
         plot();
   });

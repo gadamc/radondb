@@ -25,23 +25,29 @@ function(head, req){
   if(req.query.download == "true"){
     
     var fileName = "radondata.csv";
-    var attName = "attachment;filename="+fileName;
-    var theBody = "";
+    var attName = "attachment;filename=\""+fileName+"\"";
+    start({
+      "headers": {
+        "Content-Type": "text/csv;charset=utf-8;header=present",
+        "Content-disposition" : attName
+      }
+    });
     for(var i = 0; i < hist.length; i++){
-      theBody += i + "," + hist[i] + "\n";
+      send(i + ',' + hist[i] + '\n');
     }
-    // send(toJSON({
-    //         "headers": {
+    // send( {
+    //         headers: {
     //           "Content-Type": "text/csv",
     //           "Content-disposition" : attName
     //         },
-    //         "body":theBody
-    //     }) );
-    send(theBody);
+    //         body:theBody
+    //     });
+    //send(theBody);
     
   }
   
   else{
+    //return toJSON(hist);
     send(toJSON(hist));
   }
   
