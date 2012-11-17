@@ -1,12 +1,10 @@
 var dbname = window.location.pathname.split("/")[1];
 var appName = window.location.pathname.split("/")[3];
 var db = $.couch.db(dbname);
-var hist = new Array();
+
 var today = new Date();
 var lastMonth = new Date();
 lastMonth.setDate(today.getDate() - 30);
-var chart;
-var options;
 var now = new Date();
 var someDaysInThePast=new Date();
 someDaysInThePast.setDate(someDaysInThePast.getDate() - 2);
@@ -56,7 +54,7 @@ $(document).ready(function(){
   $(function() {
     
         $('#idate').datetimepicker({
-          numberOfMonths: 2,
+          numberOfMonths: 1,
           showButtonPanel: true,
           changeMonth: true,
           changeYear: true,
@@ -82,7 +80,7 @@ $(document).ready(function(){
         });
         
         $('#fdate').datetimepicker({
-          numberOfMonths: 2,
+          numberOfMonths: 1,
           showButtonPanel: true,
           defaultDate: today,
           changeMonth: true,
@@ -125,11 +123,11 @@ function plot() {
    var endDate = Date.parse($("#fdate").val())/1000.0;
   
    
-   options = { 
+   var options = { 
        chart: {
           renderTo: 'chart',
-          zoomType: 'xy',
-          animation: false,
+          zoomType: 'x',
+          animation: true,
           defaultSeriesType: 'scatter'
           //spacingRight: 20
        },
@@ -205,6 +203,7 @@ function plot() {
     $('#button-plot').attr("disabled", "disabled").addClass( 'ui-state-disabled' );
     
      //need to set up the histogram
+     console.log('calling hist');
      db.list(appName+ "/hist", "bydate",
        {
          endkey:endDate, 
@@ -217,7 +216,9 @@ function plot() {
          dataType: 'json',
          async: false,
           success:function(theData){ 
+              console.log(theData);
               options.series[0].data = theData;
+              console.log(options);
               chart = new Highcharts.Chart(options);
               $('#button-plot').removeAttr("disabled").removeClass( 'ui-state-disabled' );
               setUpDownloadLink(); 
