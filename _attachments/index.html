@@ -6,92 +6,12 @@
 
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <title>Edelweiss Alpha Counter for Radon Monitoring</title>
-  <link type="text/css" href="css/bluesmooth/jquery-ui-1.8.16.custom.css" rel="stylesheet" />	
-  <link rel="stylesheet" type="text/css" href="css/style.css"/>	
-  <link rel="stylesheet" type="text/css" href="css/highslide.css" />
-  <link type="text/css" href="css/bootstrap.min.css" rel="stylesheet" />	
-  <style type="text/css">
-  /* Override some defaults */
-  html, body {
-    background-color: #eee;
-  }
-  body {
-    padding-top: 40px; /* 40px to make the container go all the way to the bottom of the topbar */
-  }
-  .container > footer p {
-    text-align: center; /* center align it with the container */
-  }
-  
 
-  /* The white background content wrapper */
-  .content {
-    background-color: #fff;
-    padding: 20px;
-    margin: 0 -20px; /* negative indent the amount of the padding to maintain the grid system */
-    -webkit-border-radius: 0 0 6px 6px;
-       -moz-border-radius: 0 0 6px 6px;
-            border-radius: 0 0 6px 6px;
-    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
-       -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
-            box-shadow: 0 1px 2px rgba(0,0,0,.15);
-  }
-
-  /* Page header tweaks */
-  .page-header {
-    background-color: #f5f5f5;
-    padding: 20px 20px 10px;
-    margin: -10px -10px 0px;
-  }
+  <!-- Le styles -->
+  <link rel="stylesheet" href="css/bootstrap.min.css">    
+  <link href="css/smoothness/jquery-ui-1.9.1.custom.css" rel="stylesheet">
+  <link href="css/mystyle.css" rel="stylesheet" type="text/css">
   
-  /* Give a quick and non-cross-browser friendly divider */
-  .span4 {
-    margin-left: 0;
-    padding-left: 20px;
-    min-height:15px;
-    height:20px
-  }
-  
-  .span2 {
-    margin-left: 0;
-    padding-left: 20px;
-    min-height:15px;
-    height:20px;
-  }
-  
-  .span3 {
-    margin-left: 0;
-    padding-left: 20px;
-    min-height:15px;
-    height:20px;
-  }
-  
-  .span5 {
-    margin-left: 0;
-    padding-left: 20px;
-    min-height:15px;
-    height:20px;
-  }
-  
-  .span6 {
-    margin-left: 0;
-    padding-left: 20px;
-    min-height:15px;
-    height:20px;
-  }
-
-  .span8 {
-    margin-left: 0;
-    padding-left: 20px;
-    min-height:15px;
-    height:20px;
-  }
-  
-  .topbar .btn {
-    border: 0;
-  }
-  
-  
-  </style>
 
 </head>
 
@@ -102,13 +22,6 @@
       <div class="container">
         <a class="brand" href="#">Edelweiss</a>
         <ul class="nav" id="navbarList">
-            <!--now loaded by javascript-->            
-            <!-- <li ><a href="/datadb/_design/app/index.html">Data Status</a></li>
-            <li ><a href="/automat/_design/cryo_2/index.html">Cryo Monitor</a></li>
-            <li ><a href="/automat/_design/cryo_2/current.html">Cryo Status</a></li>
-            <li ><a href="/muonhv/_design/app/index.html">Muon Veto HV Monitor</a></li>
-            <li ><a href="/radon/_design/app/index.html">Radon Monitor</a></li>
-            <li ><a href="/ntdchar/_design/app/index.html">NTD Characteristics</a></li> -->
           </ul>
       </div>
     </div>
@@ -116,106 +29,114 @@
   
   <div class="container">
 
-    <div class="content">
       
-      <div class="page-header">
-        <!-- <h1>Samba Status<small>  The most recent Samba DAQ information</small></h1> -->
-        <h1>Radon Monitor</h1><br> 
-        <div id = "date"></div>
+    <div class="page-header">
+      <h1>Radon Monitor</h1><br> 
+      <div id="lastDate"></div>
+    </div>
+
+
+    <div class="row">
+      <div class="span4">
+        <label class="input-label">Start Date</label>
+        <input id="idate" name="idate" placeholder="month/day/year"/>
       </div>
-      <div class="container">
-        <br><br>
-        <table class="input-details">
-          <tr>
-            <td>
-              <div class="input-row">
-                <label class="input-label">Start Date</label>
-                <input id="idate" name="idate" placeholder="month/day/year" class="input-box ui-widget-content ui-corner-all" style="width:150px"/>
-              </div>
 
-              <br>
-              <div class="input-row">
-                <label class="input-label">End Date</label>
-                <input id="fdate" name="fdate" placeholder="month/day/year" class="input-box ui-widget-content ui-corner-all" style="width:150px"/>
-              </div>
-            </td>
-            <td>
-              <div class="input-row">
-                <label class="input-label">Low Energy Threshold [ADC]</label>
-                <input id="lowE" name="lowE" placeholder="0" value = "0" class="input-box ui-widget ui-widget-content ui-corner-all" style="width:150px"/>
-              </div>
-
-              <br>
-              <div class="input-row">
-                <label class="input-label">High Energy Threshold [ADC]</label>
-                <input id="highE" name="highE" placeholder="4100" value="4100" class="input-box ui-widget ui-widget-content ui-corner-all" style="width:150px"/>
-              </div>
-            </td>
-          </tr>
-        </table>
-
-      
-
-
-        <br>
-        <div class="button-row">
-          <button id="button-plot"  onclick="javascript:plot();">Plot</button>
-        </div>
-        <br>
-        <div class="download-row">
-          <a id="download-link" >Download Data</a>
-        </div>
-
-        <br>
-        <div id="chart" style="width: 800px; height: 400px; margin: 0 auto"></div>
-        
-        <!-- <div id="chart_rates" style="width: 800px; height: 400px; margin: 0 auto"></div>
-
-        <div id="reporting" style="position:relative; left: 100px; bottom: 350px; font: 12px Arial, Verdana; color: #666;"></div>
-
-        <div id="countsperday" style="width: 800px; height: 400px; margin: 0 auto"></div>
-
-    <label for="efficienyValue">Efficiency Factor:</label>
-        <input type="text" id="efficienyValue" style="border:0; color:#f6931f; font-weight:bold;" />
-        <div id="efficiencySlider" style="width: 400px"></div>
-        <br>
-        <label for="adcrange">ADC range:</label>
-        <input type="text" id="adcrange" style="border:0; color:#f6931f; font-weight:bold;" />
-        <div id="adcSlider" style="width: 400px"></div>
-        <br>
-        <table class"measurement-table">
-            <tr class="measurement-row">
-              <td></td>
-              <td class="item" id="countValue">5</td>
-              <td class="item" id="countUnit">counts/sec</td>
-            </tr>
-
-            <tr class="measurement-row">
-              <td>Rn Activity</td>
-              <td class="item" id="activityValue">5</td>
-              <td class="item" id="activityUnit">Bq/m<super>3</super></td>
-            </tr>
-        </table> -->
-    
+      <div class="span4 offset1">
+        <label class="input-label">Low Energy Threshold [ADC]</label>
+        <input id="lowE" name="lowE" placeholder="0" value = "0"/>
       </div>
     </div>
+
+    <div class="row">
+      <div class="span4">
+        <label class="input-label">End Date</label>
+        <input id="fdate" name="fdate" placeholder="month/day/year"/>
+      </div>
+
+      <div class="span4 offset1">
+        <label class="input-label">High Energy Threshold [ADC]</label>
+        <input id="highE" name="highE" placeholder="4100" value="4100"/>
+      </div>
+    </div>
+
+    <br><br>
+    <div class="row">
+      <button class="btn span2"  id="button-plot" >Plot</button>
+    </div>
+
+    <div class="row download-row">
+      <br><br>
+      <div class="span12">
+        <a id="download-link" >Download Data</a>
+      </div>
+    </div>
+
+    <br><br>
+    <div class="row">
+      <div class="span12">
+        <div id="chart" style="width: 800px; height: 400px; margin: 0 auto"></div>
+      </div>
+    </div>
+<!--     <br><br>
+
+    <div class="span12">
+      
+    </div>
+
+    <br> -->
+
+    
+
+<!--     <br>
+ -->    
+    
+    
+    <!-- <div id="chart_rates" style="width: 800px; height: 400px; margin: 0 auto"></div>
+
+    <div id="reporting" style="position:relative; left: 100px; bottom: 350px; font: 12px Arial, Verdana; color: #666;"></div>
+
+    <div id="countsperday" style="width: 800px; height: 400px; margin: 0 auto"></div>
+
+    <label for="efficienyValue">Efficiency Factor:</label>
+    <input type="text" id="efficienyValue" style="border:0; color:#f6931f; font-weight:bold;" />
+    <div id="efficiencySlider" style="width: 400px"></div>
+    <br>
+    <label for="adcrange">ADC range:</label>
+    <input type="text" id="adcrange" style="border:0; color:#f6931f; font-weight:bold;" />
+    <div id="adcSlider" style="width: 400px"></div>
+    <br>
+    <table class"measurement-table">
+        <tr class="measurement-row">
+          <td></td>
+          <td class="item" id="countValue">5</td>
+          <td class="item" id="countUnit">counts/sec</td>
+        </tr>
+
+        <tr class="measurement-row">
+          <td>Rn Activity</td>
+          <td class="item" id="activityValue">5</td>
+          <td class="item" id="activityUnit">Bq/m<super>3</super></td>
+        </tr>
+    </table> -->
+  
   </div>
-    <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
-    <script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
 
-    <script type="text/javascript" src="js/jquery.couch.js"></script>
-    <script type="text/javascript" src="js/jquery-ui-sliderextension.js"></script>
+  <script type="text/javascript" src="js/jquery-1.8.2.js"></script>
+  <script type="text/javascript" src="js/jquery-ui-1.9.1.custom.min.js"></script>
+  <script type="text/javascript" src="js/jquery-ui-timepicker-addon.js"></script>
+  <script type="text/javascript" src="js/jquery-ui-sliderAccess.js"></script>
 
-    <script type="text/javascript" src="js/jquery-ui-datetimepicker.js"></script>
+  <script type="text/javascript" src="js/jquery.couch.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+  <script type="text/javascript" src="js/highcharts.js"></script>
+  <script type="text/javascript" src="js/modules/exporting.js"></script>
+
+  <script type="text/javascript" src="js/navbar.js"></script>
     
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-
-
-    <script src="script/highcharts.js" type="text/javascript"></script>
-    <script src="script/modules/exporting.js" type="text/javascript"></script>
-    
-    <script type="text/javascript" src="js/index.js"></script>
+  <script type="text/javascript" src="index.js"></script>
  
-  </body>
+</body>
 
-  </html>
+</html>
