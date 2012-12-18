@@ -9,6 +9,14 @@ var now = new Date();
 var someDaysInThePast=new Date();
 someDaysInThePast.setDate(someDaysInThePast.getDate() - 2);
 
+var timeResolution = 4*3600;
+var radonLowE = 2100;
+var radonHighE = 2700;
+var radonFactor = 98.7; //converts counts to Bq/cm^3
+
+var histChart;
+var trendChart;
+
 // ____________________________________________________________________________________
 $(document).ready(function(){
 
@@ -127,15 +135,9 @@ $(document).ready(function(){
 
 });
 
-// ____________________________________________________________________________________
-function plot() {
-
-    
-   var startDate = Date.parse($("#idate").val())/1000.0;
-   var endDate = Date.parse($("#fdate").val())/1000.0;
-  
-   
-   var options = { 
+function getHistOptions()
+{
+  var options = { 
        chart: {
           renderTo: 'chart',
           zoomType: 'x',
@@ -206,47 +208,174 @@ function plot() {
 
        series: [{
          //type: 'series',
-         linewidth:1
+         linewidth:1,
+         data: []
        }]
      };
 
-   
-    //$('#button-plot').attr("disabled", "disabled").addClass( 'ui-state-disabled' );
-    
-     //need to set up the histogram
-     //console.log('calling hist');
-     db.list(appName+ "/hist", "bydate",
-       {
-         endkey:endDate, 
-         startkey:startDate, 
-         reduce:false,
-         lowE: parseInt($("#lowE").val()),
-         highE: parseInt($("#highE").val())
-       }, 
-       {
-         dataType: 'json',
-         async: false,
-          success:function(theData){ 
-              //console.log(theData);
-              options.series[0].data = theData;
-              //console.log(options);
-              chart = new Highcharts.Chart(options);
-              $('#button-plot').button('reset');
-              // $('#button-plot').removeAttr("disabled").removeClass( 'ui-state-disabled' );
-              setUpDownloadLink(); 
+     return options;
+}
+
+function getTrendOptions()
+{
+  var options = { 
+       chart: {
+          renderTo: 'radonVtime',
+          zoomType: 'x',
+          animation: true,
+          defaultSeriesType: 'scatter'
+          //spacingRight: 20
+       },
+        title: {
+          text: 'Radon Level'
+       },
+       xAxis: {
+          title: {
+             enabled: true,
+             text:''
           },
-          error: function(req, textStatus, errorThrown){
-            $("#chart").html("woops...");
+          endOnTick:true,
+          startOnTick:true,
+          showFirstLabel : false
+       },
+       yAxis: {
+          title: {
+             text: 'Bq/cm^3'
+          },
+          //min: 0.6,
+          //startOnTick: false,
+          showFirstLabel: false,
+          labels: {
+                     align: 'left',
+                     x: 3,
+                     y: -2
+                 }
+       },
+       tooltip: {
+         enabled: false
+       },
+       plotOptions: {
+          scatter: {
+                      marker: {
+                         radius: 1,
+                         states: {
+                            hover: {
+                               enabled: true,
+                               lineColor: 'rgb(100,100,100)'
+                            }
+                         }
+                      },
+                      states: {
+                         hover: {
+                            marker: {
+                               enabled: false
+                            }
+                         }
+                      },
+                      point: {
+                                      events: {
+                                          mouseOver: function() {
+                                              $('#reporting').html('bin: '+ this.x +', counts: '+ this.y);
+                                          }
+                                      }
+                                  },
+                                  events: {
+                                      mouseOut: function() {                        
+                                          $('#reporting').empty();
+                                      }
+                                  }
+                   }
+       },
+
+       series: [{
+         type: 'series',
+         linewidth:1, 
+         data: []
+       }]
+     };
+
+     return options;
+}
+
+// ____________________________________________________________________________________
+function plot() {
+
+    
+  var startDate = Date.parse($("#idate").val())/1000.0;
+  var endDate = Date.parse($("#fdate").val())/1000.0;
+  
+   
+  var histOptions = getHistOptions();
+  histChart = new Highcharts.Chart(histOptions);
+
+  var trendOptions = getTrendOptions();
+  trendChart = new Highcharts.Chart(trendChart);
+   
+  //$('#button-plot').attr("disabled", "disabled").addClass( 'ui-state-disabled' );
+    
+  //need to set up the histogram
+  //console.log('calling hist');
+
+  var numTimeBins = parseInt((endkey - startkey)/timeResolution);
+  if( (endkey - startkey)/timeResolution % numTimeBins > 0)
+    numTimeBins += 1;
+
+  var numReturns = 0;
+  var subDate = startDate + timeResolution;
+
+
+  while(subDate < endDate){
+    db.list(appName+ "/hist", "bydate",
+      {
+        endkey:subDate, 
+        startkey:startDate, 
+        reduce:false,
+        lowE: parseInt($("#lowE").val()),
+        highE: parseInt($("#highE").val())
+      }, 
+      {
+        dataType: 'json',
+        async: false, //does this do anything?
+        success:function(theData){ 
+          //console.log(theData);
+          var radonCnt = 0;
+
+          $.each(theData, function(i, dd){
+            histChart.series[0].data[i] += dd;
+            if( dd >= radonLowE && dd < radonHighE){
+              radonCnt += 1;
+            }
+
+          });
+          
+          trendChart.series[0].data.push([ parseInt(startDate + subDate/2.), radonFactor*radonCnt/(subDate - startDate)]);
+          
+          histChart.redraw();
+          trendChart.redraw();
+
+          numReturns += 1;       
+
+          if(numReturns == numTimeBins){
             $('#button-plot').button('reset');
             // $('#button-plot').removeAttr("disabled").removeClass( 'ui-state-disabled' );
-            
-          }
+            setUpDownloadLink(); 
+          }  
+
+        },
+        error: function(req, textStatus, errorThrown){
+          $("#chart").html("woops...");
+          $('#button-plot').button('reset');
+          // $('#button-plot').removeAttr("disabled").removeClass( 'ui-state-disabled' ); 
         }
-      );
-      
-    
+      }
+    );
+
+    subDate += timeResolution;
+
+  }      
 
 }
+
 
 // ____________________________________________________________________________________
 function setUpDownloadLink() {
