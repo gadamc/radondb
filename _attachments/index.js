@@ -16,6 +16,8 @@ var radonFactor = 98.7; //converts counts to Bq/cm^3
 
 var histChart;
 var trendChart;
+var histArray;
+var trendArray;
 
 // ____________________________________________________________________________________
 $(document).ready(function(){
@@ -306,8 +308,9 @@ function plot() {
   var startDate = Date.parse($("#idate").val())/1000.0;
   var endDate = Date.parse($("#fdate").val())/1000.0;
   
-   
-  var histOptions = getHistOptions();
+  trendArray = null;
+  histArray = null;
+  
   
 
   //var trendOptions = getTrendOptions();
@@ -356,16 +359,20 @@ function plot() {
           numReturns += 1;
           console.log('returns/bins =  ' + numReturns + ' / ' + numTimeBins)
 
+          if(histArray == null){
+            histArray = new Array;
+            histArray.length = theData.length;
+          }
           
           $.each(theData, function(i, dd){
-            histOptions.series[0].data[i] += dd;
+            hhistArray[i] += dd;
             if( dd >= radonLowE && dd < radonHighE){
               radonCnt += 1;
             }
 
           });
           
-          //trendChart.series[0].data.push([ parseInt(startDate + subEndDate/2.), radonFactor*radonCnt/(subEndDate - startDate)]);
+          //trendChart.series[0].data.push([ parseInt(subStartDate + subEndDate/2.), radonFactor*radonCnt/(subEndDate - subStartDate)]);
           
           //histChart.redraw();
           //trendChart.redraw();
@@ -373,16 +380,23 @@ function plot() {
                  
 
           if(numReturns == numTimeBins){
+
+            var histOptions = getHistOptions();
+            histOptions.series[0].data = histArray;
+            histChart = new Highcharts.Chart(histOptions);
+
             $('#button-plot').button('reset');
             // $('#button-plot').removeAttr("disabled").removeClass( 'ui-state-disabled' );
             setUpDownloadLink(); 
-            histChart = new Highcharts.Chart(histOptions);
+
           }  
 
 
         },
         error: function(req, textStatus, errorThrown){
-          $("#chart").html("woops...");
+          $("#chart").html("an error occurred...");
+          console.log('an error was thrown:');
+          console.log(errorThrown);
           $('#button-plot').button('reset');
           // $('#button-plot').removeAttr("disabled").removeClass( 'ui-state-disabled' ); 
         }
