@@ -230,13 +230,15 @@ function getTrendOptions()
           text: 'Radon Level'
        },
        xAxis: {
-          title: {
-             enabled: true,
-             text:''
-          },
-          endOnTick:true,
-          startOnTick:true,
-          showFirstLabel : false
+         type: 'datetime',
+         // maxZoom: 1000.0* 60.0, // 1 minutes
+         // title: {
+         //    text: null
+         // }
+         dateTimeLabelFormats: {
+          day: '%e %b',
+          hour: '%e %b %H:%M'   
+         }
        },
        yAxis: {
           title: {
@@ -288,7 +290,7 @@ function getTrendOptions()
        },
 
        series: [{
-         type: 'series',
+         //type: 'series',
          linewidth:1, 
          data: []
        }]
@@ -306,29 +308,40 @@ function plot() {
   
    
   var histOptions = getHistOptions();
-  histChart = new Highcharts.Chart(histOptions);
+  
 
-  var trendOptions = getTrendOptions();
-  trendChart = new Highcharts.Chart(trendChart);
+  //var trendOptions = getTrendOptions();
+  //trendChart = new Highcharts.Chart(trendChart);
    
   //$('#button-plot').attr("disabled", "disabled").addClass( 'ui-state-disabled' );
     
   //need to set up the histogram
   //console.log('calling hist');
 
-  var numTimeBins = parseInt((endkey - startkey)/timeResolution);
-  if( (endkey - startkey)/timeResolution % numTimeBins > 0)
+  var numTimeBins = parseInt((endDate - startDate)/timeResolution);
+  console.log(numTimeBins);
+  if( (endDate - startDate)/timeResolution % numTimeBins > 0){
     numTimeBins += 1;
+    console.log('plus one');
+  }
+
 
   var numReturns = 0;
-  var subDate = startDate + timeResolution;
+  var subEndDate = startDate + timeResolution;
+  var subStartDate = startDate;
+  
+  console.log(startDate + ' -> ' + endDate);
 
+  while(subStartDate < endDate){
+    if(subEndDate > endDate)
+      subEndDate = endDate;
 
-  while(subDate < endDate){
+    console.log(subStartDate + ' -> ' + subEndDate);
+
     db.list(appName+ "/hist", "bydate",
       {
-        endkey:subDate, 
-        startkey:startDate, 
+        endkey:subEndDate, 
+        startkey:subStartDate, 
         reduce:false,
         lowE: parseInt($("#lowE").val()),
         highE: parseInt($("#highE").val())
@@ -339,27 +352,33 @@ function plot() {
         success:function(theData){ 
           //console.log(theData);
           var radonCnt = 0;
+          console.log('success ' + theData.length)
+          numReturns += 1;
+          console.log('returns/bins =  ' + numReturns + ' / ' + numTimeBins)
 
+          
           $.each(theData, function(i, dd){
-            histChart.series[0].data[i] += dd;
+            histOptions.series[0].data[i] += dd;
             if( dd >= radonLowE && dd < radonHighE){
               radonCnt += 1;
             }
 
           });
           
-          trendChart.series[0].data.push([ parseInt(startDate + subDate/2.), radonFactor*radonCnt/(subDate - startDate)]);
+          //trendChart.series[0].data.push([ parseInt(startDate + subEndDate/2.), radonFactor*radonCnt/(subEndDate - startDate)]);
           
-          histChart.redraw();
-          trendChart.redraw();
+          //histChart.redraw();
+          //trendChart.redraw();
 
-          numReturns += 1;       
+                 
 
           if(numReturns == numTimeBins){
             $('#button-plot').button('reset');
             // $('#button-plot').removeAttr("disabled").removeClass( 'ui-state-disabled' );
             setUpDownloadLink(); 
+            histChart = new Highcharts.Chart(histOptions);
           }  
+
 
         },
         error: function(req, textStatus, errorThrown){
@@ -370,8 +389,8 @@ function plot() {
       }
     );
 
-    subDate += timeResolution;
-
+    subEndDate += timeResolution;
+    subStartDate += timeResolution;
   }      
 
 }
