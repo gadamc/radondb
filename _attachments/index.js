@@ -18,6 +18,7 @@ var histChart;
 var trendChart;
 var histArray;
 var trendArray;
+var trendTimeBinArray;
 
 // ____________________________________________________________________________________
 $(document).ready(function(){
@@ -308,7 +309,9 @@ function plot() {
   var startDate = Date.parse($("#idate").val())/1000.0;
   var endDate = Date.parse($("#fdate").val())/1000.0;
   
+  //reset the local data variables...
   trendArray = null;
+  trendTimeBinArray = null;
   histArray = null;
   
   
@@ -360,12 +363,14 @@ function plot() {
           console.log('returns/bins =  ' + numReturns + ' / ' + numTimeBins)
 
           if(histArray == null){
-            histArray = new Array;
-            histArray.length = theData.length;
+            histArray = [];
+            //how do i initialize an array in javascript? 
+            for(var ll = 0; ll < theData.length; ll++)
+              histArray[ll] = 0;
           }
           
           $.each(theData, function(i, dd){
-            hhistArray[i] += dd;
+            histArray[i] += dd;
             if( dd >= radonLowE && dd < radonHighE){
               radonCnt += 1;
             }
