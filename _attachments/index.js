@@ -10,8 +10,8 @@ var someDaysInThePast=new Date();
 someDaysInThePast.setDate(someDaysInThePast.getDate() - 2);
 
 var timeResolution = 4*3600;
-var radonLowE = 2100;
-var radonHighE = 2700;
+var radonLowE = 2000;
+var radonHighE = 2350;
 var radonFactor = 98.7; //converts counts to Bq/cm^3
 
 var histChart;
@@ -226,7 +226,8 @@ function getTrendOptions()
           renderTo: 'radonVtime',
           zoomType: 'x',
           animation: true,
-          defaultSeriesType: 'scatter'
+          defaultSeriesType: 'scatter',
+          type: 'scatter'
           //spacingRight: 20
        },
         title: {
@@ -245,7 +246,7 @@ function getTrendOptions()
        },
        yAxis: {
           title: {
-             text: 'Bq/cm^3'
+             text: 'Bq/m^3'
           },
           //min: 0.6,
           //startOnTick: false,
@@ -311,32 +312,28 @@ function plot() {
   
   //reset the local data variables...
   trendArray = null;
-  trendTimeBinArray = null;
   histArray = null;
   
-  
-
-  //var trendOptions = getTrendOptions();
-  //trendChart = new Highcharts.Chart(trendChart);
-   
-  //$('#button-plot').attr("disabled", "disabled").addClass( 'ui-state-disabled' );
-    
-  //need to set up the histogram
-  //console.log('calling hist');
 
   var numTimeBins = parseInt((endDate - startDate)/timeResolution);
-  console.log(numTimeBins);
+  console.log('date range: ' + startDate + ' -> ' + endDate)
+  console.log('time resolution: ' + timeResolution);
+  console.log('initial number of time bins: ' + numTimeBins);
+
   if( (endDate - startDate)/timeResolution % numTimeBins > 0){
     numTimeBins += 1;
-    console.log('plus one');
+    console.log('plus one for remaining time range');
   }
+  console.log('total number of time bins: ' + numTimeBins);
 
+  console.log('Radon count range (low E, high E): ' + radonLowE + ' , ' + radonHighE);
+  console.log('Radon calibration factor: ' + radonFactor);
 
   var numReturns = 0;
   var subEndDate = startDate + timeResolution;
   var subStartDate = startDate;
   
-  console.log(startDate + ' -> ' + endDate);
+  console.log();
 
   while(subStartDate < endDate){
     if(subEndDate > endDate)
@@ -358,7 +355,7 @@ function plot() {
         success:function(theData){ 
           //console.log(theData);
           var radonCnt = 0;
-          console.log('success ' + theData.length)
+          console.log('data successfully returned ' + theData.length)
           numReturns += 1;
           console.log('returns/bins =  ' + numReturns + ' / ' + numTimeBins)
 
@@ -368,15 +365,31 @@ function plot() {
             for(var ll = 0; ll < theData.length; ll++)
               histArray[ll] = 0;
           }
+
+          if(trendArray == null){
+            trendArray = []
+            for(var ll = 0; ll < numTimeBins; ll++){
+              trendArray[ll] = [startDate + ll*timeResolution, 0]
+            }
+          }
           
           $.each(theData, function(i, dd){
             histArray[i] += dd;
             if( dd >= radonLowE && dd < radonHighE){
               radonCnt += 1;
             }
-
           });
           
+          //find the right element of the trendArray
+          for(var ll = 0; ll < numTimeBins-1; ll++){
+            if(subStartDate >= trendArray[ll][0] && subStartDate < trendArray[ll+1][0] ){
+              trendArray[ll][1] = radonFactor*radonCnt/(subEndDate - subStartDate);
+              break;
+            }
+          }
+          if(subStartDate >= trendArray[numTimeBins-1][0]){
+            trendArray[numTimeBins-1][1] = radonFactor*radonCnt/(subEndDate - subStartDate);
+          }
           //trendChart.series[0].data.push([ parseInt(subStartDate + subEndDate/2.), radonFactor*radonCnt/(subEndDate - subStartDate)]);
           
           //histChart.redraw();
@@ -389,6 +402,10 @@ function plot() {
             var histOptions = getHistOptions();
             histOptions.series[0].data = histArray;
             histChart = new Highcharts.Chart(histOptions);
+
+            var trendOptions = getTrendOptions();
+            trendOptions.series[0].data = trendArray;
+            trendChart = new Highcharts.Chart(trendOptions);
 
             $('#button-plot').button('reset');
             // $('#button-plot').removeAttr("disabled").removeClass( 'ui-state-disabled' );
