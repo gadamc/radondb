@@ -208,10 +208,12 @@ function getHistOptions()
                                   }
                    }
        },
-
+       legend: {
+         enabled: false
+       },
        series: [{
          //type: 'series',
-         linewidth:1,
+         linewidth:2,
          data: []
        }]
      };
@@ -233,6 +235,9 @@ function getTrendOptions()
         title: {
           text: 'Radon Level'
        },
+       legend: {
+         enabled: false
+       },
        xAxis: {
          type: 'datetime',
          maxZoom: 1000.0* timeResolution, 
@@ -246,7 +251,8 @@ function getTrendOptions()
        },
        yAxis: {
           title: {
-             text: 'Bq/m^3'
+             useHTML: true,
+             text: 'Bq/m<sup>3</sup>'
           },
           //min: 0.6,
           //startOnTick: false,
@@ -259,9 +265,10 @@ function getTrendOptions()
        },
        tooltip: {
         enabled: true,
+        useHTML: true,
         formatter: function() {          
          return '<b>Low Bin Edge and level</b><br/><br/>'+
-         Highcharts.dateFormat('%e %b %Y, %H:%M:%S', this.x) +'<br/>'+ this.y.toFixed(2) +' Bq/m^3';
+         Highcharts.dateFormat('%e %b %Y, %H:%M:%S', this.x) +'<br/>'+ this.y.toFixed(2) +' Bq/m<sup>3</sup>';
         }
        },
        plotOptions: {
