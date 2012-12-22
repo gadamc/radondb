@@ -226,8 +226,8 @@ function getTrendOptions()
           renderTo: 'radonVtime',
           zoomType: 'x',
           animation: true,
-          defaultSeriesType: 'scatter',
-          type: 'scatter'
+          defaultSeriesType: 'spline',
+          type: 'spline'
           //spacingRight: 20
        },
         title: {
@@ -236,9 +236,9 @@ function getTrendOptions()
        xAxis: {
          type: 'datetime',
          maxZoom: 1000.0* timeResolution, 
-         // title: {
-         //    text: null
-         // }
+         title: {
+             text: null
+         },
          dateTimeLabelFormats: {
           day: '%e %b',
           hour: '%e %b %H:%M'   
@@ -258,11 +258,11 @@ function getTrendOptions()
                  }
        },
        tooltip: {
-         enabled: true,
-         formatter: function() {
-                        return ''+
-                        this.y.toFixed(3) +' Bq/m^3';
-                }
+        enabled: true,
+        formatter: function() {          
+         return '<b>Low Bin Edge and level</b><br/><br/>'+
+         Highcharts.dateFormat('%e %b %Y, %H:%M:%S', this.x) +'<br/>'+ this.y.toFixed(2) +' Bq/m^3';
+        }
        },
        plotOptions: {
           scatter: {
@@ -270,15 +270,14 @@ function getTrendOptions()
                          radius: 5,
                          states: {
                             hover: {
-                               enabled: true,
-                               lineColor: 'rgb(0,0,0)'
+                               enabled: true
                             }
                          }
                       },
                       states: {
                          hover: {
                             marker: {
-                               enabled: false
+                               enabled: true
                             }
                          }
                       },
@@ -317,6 +316,9 @@ function plot() {
   //reset the local data variables...
   trendArray = null;
   histArray = null;
+  console.log('initilize data')
+  console.log(trendArray)
+  console.log(histArray)
   
 
   var numTimeBins = parseInt((endDate - startDate)/timeResolution);
@@ -338,12 +340,22 @@ function plot() {
   var subStartDate = startDate;
   
   console.log();
+  if(trendArray == null){
+    trendArray = []
+    for(var ll = 0; ll < numTimeBins; ll++){
+      trendArray[ll] = [1000.0*(startDate + ll*timeResolution), 0.0]
+    }
+  }
+  console.log('trend array created')
+  console.log(trendArray)
 
   while(subStartDate < endDate){
     if(subEndDate > endDate)
       subEndDate = endDate;
 
     console.log(subStartDate + ' -> ' + subEndDate);
+    console.log(new Date(subStartDate*1000.0) + ' -> ' + new Date(subEndDate*1000.0));
+
 
     db.list(appName+ "/hist", "bydate",
       {
@@ -374,15 +386,7 @@ function plot() {
               histArray[ll] = 0;
           }
 
-          if(trendArray == null){
-            trendArray = []
-            for(var ll = 0; ll < numTimeBins; ll++){
-              trendArray[ll] = [1000.0*(startDate + ll*timeResolution), 0]
-            }
-          }
-
-          //console.log(radonLowE + ' -> ' + radonHighE);
-          
+                    
           for(var ll = 0; ll < theHist.length; ll++){
             var histVal = theHist[ll];
             histArray[ll] += histVal;
@@ -405,12 +409,13 @@ function plot() {
           for(var ll = 0; ll < numTimeBins-1; ll++){
             if(thisStartTime*1000.0 >= trendArray[ll][0] && thisStartTime*1000.0 < trendArray[ll+1][0] ){
               trendArray[ll][1] = radonFactor*radonCnt/(thisEndTime - thisStartTime);
-              console.log('Found trend bin ' + ll + ' low bin edge: ' + trendArray[ll][0])
+              console.log('Found trend bin ' + ll + ' low bin edge: ' + trendArray[ll][0] + ' -> ' + new Date(trendArray[ll][0]));
               break;
             }
           }
-          if(thisStartTime >= trendArray[numTimeBins-1][0]){
+          if(thisStartTime*1000.0 >= trendArray[numTimeBins-1][0]){
             trendArray[numTimeBins-1][1] = radonFactor*radonCnt/(thisEndTime - thisStartTime);
+            console.log('Found trend bin ' + numTimeBins-1 + ' low bin edge: ' + trendArray[numTimeBins-1][0] + ' -> ' + new Date(trendArray[numTimeBins-1][0]));
           }
           //trendChart.series[0].data.push([ parseInt(thisStartTime + thisEndTime/2.), radonFactor*radonCnt/(thisEndTime - thisStartTime)]);
           
@@ -420,6 +425,9 @@ function plot() {
                  
 
           if(numReturns == numTimeBins){
+
+            console.log('trend array filled')
+            console.log(trendArray)
 
             var histOptions = getHistOptions();
             histOptions.series[0].data = histArray;
