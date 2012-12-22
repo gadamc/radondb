@@ -48,7 +48,12 @@ function(head, req){
   
   else{
     //return toJSON(hist);
-    send(toJSON(hist));
+    if(req.query.sendDates == "true"){
+      send(toJSON({'hist':hist, 'starttime': req.query.startkey, 'endtime': req.query.endkey}));
+    }
+    else{
+      send(toJSON(hist));
+    }
   }
   
 }

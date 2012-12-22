@@ -10,8 +10,8 @@ var someDaysInThePast=new Date();
 someDaysInThePast.setDate(someDaysInThePast.getDate() - 2);
 
 var timeResolution = 4*3600;
-var radonLowE = 2000;
-var radonHighE = 2350;
+var radonLowE = 2000.0;
+var radonHighE = 2350.0;
 var radonFactor = 98.7; //converts counts to Bq/cm^3
 
 var histChart;
@@ -235,7 +235,7 @@ function getTrendOptions()
        },
        xAxis: {
          type: 'datetime',
-         // maxZoom: 1000.0* 60.0, // 1 minutes
+         maxZoom: 1000.0* timeResolution, 
          // title: {
          //    text: null
          // }
@@ -258,16 +258,20 @@ function getTrendOptions()
                  }
        },
        tooltip: {
-         enabled: false
+         enabled: true,
+         formatter: function() {
+                        return ''+
+                        this.y.toFixed(3) +' Bq/m^3';
+                }
        },
        plotOptions: {
           scatter: {
                       marker: {
-                         radius: 1,
+                         radius: 5,
                          states: {
                             hover: {
                                enabled: true,
-                               lineColor: 'rgb(100,100,100)'
+                               lineColor: 'rgb(0,0,0)'
                             }
                          }
                       },
@@ -295,7 +299,7 @@ function getTrendOptions()
 
        series: [{
          //type: 'series',
-         linewidth:1, 
+         linewidth:2, 
          data: []
        }]
      };
@@ -347,50 +351,68 @@ function plot() {
         startkey:subStartDate, 
         reduce:false,
         lowE: parseInt($("#lowE").val()),
-        highE: parseInt($("#highE").val())
+        highE: parseInt($("#highE").val()),
+        sendDates: "true"
       }, 
       {
         dataType: 'json',
         async: false, //does this do anything?
-        success:function(theData){ 
-          //console.log(theData);
+        success:function(theReturn){ 
+          console.log(theReturn);
           var radonCnt = 0;
-          console.log('data successfully returned ' + theData.length)
+          var thisStartTime = theReturn['starttime']
+          var thisEndTime = theReturn['endtime']
+          var theHist = theReturn['hist']
+          console.log('data successfully returned ' + theHist.length)
           numReturns += 1;
           console.log('returns/bins =  ' + numReturns + ' / ' + numTimeBins)
 
           if(histArray == null){
             histArray = [];
             //how do i initialize an array in javascript? 
-            for(var ll = 0; ll < theData.length; ll++)
+            for(var ll = 0; ll < theHist.length; ll++)
               histArray[ll] = 0;
           }
 
           if(trendArray == null){
             trendArray = []
             for(var ll = 0; ll < numTimeBins; ll++){
-              trendArray[ll] = [startDate + ll*timeResolution, 0]
+              trendArray[ll] = [1000.0*(startDate + ll*timeResolution), 0]
             }
           }
+
+          //console.log(radonLowE + ' -> ' + radonHighE);
           
-          $.each(theData, function(i, dd){
-            histArray[i] += dd;
-            if( dd >= radonLowE && dd < radonHighE){
-              radonCnt += 1;
+          for(var ll = 0; ll < theHist.length; ll++){
+            var histVal = theHist[ll];
+            histArray[ll] += histVal;
+            
+            if( (ll >= radonLowE) && (ll < radonHighE) && histVal > 0){
+              radonCnt += histVal;
             }
-          });
+            
+          }
+          // $.each(theHist, function(i, dd){
+          //   histArray[i] += dd;
+          //   if( dd >= radonLowE && dd < radonHighE){
+          //     radonCnt += dd;
+          //   }
+          // });
           
+          console.log('number of radon counts in this time period ' + radonCnt);
+          console.log('radon level in this time period ' + radonFactor*radonCnt/(thisEndTime - thisStartTime));
           //find the right element of the trendArray
           for(var ll = 0; ll < numTimeBins-1; ll++){
-            if(subStartDate >= trendArray[ll][0] && subStartDate < trendArray[ll+1][0] ){
-              trendArray[ll][1] = radonFactor*radonCnt/(subEndDate - subStartDate);
+            if(thisStartTime*1000.0 >= trendArray[ll][0] && thisStartTime*1000.0 < trendArray[ll+1][0] ){
+              trendArray[ll][1] = radonFactor*radonCnt/(thisEndTime - thisStartTime);
+              console.log('Found trend bin ' + ll + ' low bin edge: ' + trendArray[ll][0])
               break;
             }
           }
-          if(subStartDate >= trendArray[numTimeBins-1][0]){
-            trendArray[numTimeBins-1][1] = radonFactor*radonCnt/(subEndDate - subStartDate);
+          if(thisStartTime >= trendArray[numTimeBins-1][0]){
+            trendArray[numTimeBins-1][1] = radonFactor*radonCnt/(thisEndTime - thisStartTime);
           }
-          //trendChart.series[0].data.push([ parseInt(subStartDate + subEndDate/2.), radonFactor*radonCnt/(subEndDate - subStartDate)]);
+          //trendChart.series[0].data.push([ parseInt(thisStartTime + thisEndTime/2.), radonFactor*radonCnt/(thisEndTime - thisStartTime)]);
           
           //histChart.redraw();
           //trendChart.redraw();
