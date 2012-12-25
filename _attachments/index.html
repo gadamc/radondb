@@ -42,23 +42,44 @@
         <label class="input-label">Start Date</label>
         <input id="idate" name="idate" placeholder="month/day/year"/>
       </div>
-
       <div class="span4 offset1">
-        <label class="input-label">Low Energy Threshold [ADC]</label>
-        <input id="lowE" name="lowE" placeholder="0" value = "0"/>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="span4">
         <label class="input-label">End Date</label>
         <input id="fdate" name="fdate" placeholder="month/day/year"/>
       </div>
+    </div>
+
+    <br><br>
+    <div class="row">
+      
+      <div class="span4">
+        <label class="input-label">Histogram Low Energy Threshold [ADC]</label>
+        <input id="lowE" name="lowE" placeholder="0" value = "0"/>
+      </div>
 
       <div class="span4 offset1">
-        <label class="input-label">High Energy Threshold [ADC]</label>
+        <label class="input-label">Histogram High Energy Threshold [ADC]</label>
         <input id="highE" name="highE" placeholder="4100" value="4100"/>
       </div>
+    </div>
+
+    <br><br>
+    <div class="row">
+      
+      <div class="span3 ">
+        <label class="input-label">Radon Level Low Energy Threshold [ADC]</label>
+        <input id="radonlowE" name="radonlowE" placeholder="2000" value = "2000"/>
+      </div>
+
+      <div class="span3 offset1 ">
+        <label class="input-label">Radon Level High Energy Threshold [ADC]</label>
+        <input id="radonhighE" name="radonhighE" placeholder="2350" value="2350"/>
+      </div>
+
+      <div class="span3 offset1 ">
+        <label class="input-label">Radon Calibration Factor</label>
+        <input id="radonFactor" name="radonFactor" placeholder="98.7" value="98.7"/>
+      </div>
+
     </div>
 
     <br><br>

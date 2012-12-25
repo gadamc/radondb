@@ -10,9 +10,9 @@ var someDaysInThePast=new Date();
 someDaysInThePast.setDate(someDaysInThePast.getDate() - 2);
 
 var timeResolution = 4*3600;
-var radonLowE = 2000.0;
-var radonHighE = 2350.0;
-var radonFactor = 98.7; //converts counts to Bq/cm^3
+//var parseFloat($("#radonlowE").val()) = 2000.0;
+//var parseFloat($("#radonhighE").val()) = 2350.0;
+//var parseFloat($("#radonFactor").val()) = 98.7; //converts counts to Bq/cm^3
 
 var histChart;
 var trendChart;
@@ -339,8 +339,8 @@ function plot() {
   }
   console.log('total number of time bins: ' + numTimeBins);
 
-  console.log('Radon count range (low E, high E): ' + radonLowE + ' , ' + radonHighE);
-  console.log('Radon calibration factor: ' + radonFactor);
+  console.log('Radon count range (low E, high E): ' + parseFloat($("#radonlowE").val()) + ' , ' + parseFloat($("#radonhighE").val()));
+  console.log('Radon calibration factor: ' + parseFloat($("#radonFactor").val()));
 
   var numReturns = 0;
   var subEndDate = startDate + timeResolution;
@@ -398,33 +398,33 @@ function plot() {
             var histVal = theHist[ll];
             histArray[ll] += histVal;
             
-            if( (ll >= radonLowE) && (ll < radonHighE) && histVal > 0){
+            if( (ll >= parseFloat($("#radonlowE").val())) && (ll < parseFloat($("#radonhighE").val())) && histVal > 0){
               radonCnt += histVal;
             }
             
           }
           // $.each(theHist, function(i, dd){
           //   histArray[i] += dd;
-          //   if( dd >= radonLowE && dd < radonHighE){
+          //   if( dd >= parseFloat($("#radonlowE").val()) && dd < parseFloat($("#radonhighE").val())){
           //     radonCnt += dd;
           //   }
           // });
           
           console.log('number of radon counts in this time period ' + radonCnt);
-          console.log('radon level in this time period ' + radonFactor*radonCnt/(thisEndTime - thisStartTime));
+          console.log('radon level in this time period ' + parseFloat($("#radonFactor").val())*radonCnt/(thisEndTime - thisStartTime));
           //find the right element of the trendArray
           for(var ll = 0; ll < numTimeBins-1; ll++){
             if(thisStartTime*1000.0 >= trendArray[ll][0] && thisStartTime*1000.0 < trendArray[ll+1][0] ){
-              trendArray[ll][1] = radonFactor*radonCnt/(thisEndTime - thisStartTime);
+              trendArray[ll][1] = parseFloat($("#radonFactor").val())*radonCnt/(thisEndTime - thisStartTime);
               console.log('Found trend bin ' + ll + ' low bin edge: ' + trendArray[ll][0] + ' -> ' + new Date(trendArray[ll][0]));
               break;
             }
           }
           if(thisStartTime*1000.0 >= trendArray[numTimeBins-1][0]){
-            trendArray[numTimeBins-1][1] = radonFactor*radonCnt/(thisEndTime - thisStartTime);
+            trendArray[numTimeBins-1][1] = parseFloat($("#radonFactor").val())*radonCnt/(thisEndTime - thisStartTime);
             console.log('Found trend bin ' + numTimeBins-1 + ' low bin edge: ' + trendArray[numTimeBins-1][0] + ' -> ' + new Date(trendArray[numTimeBins-1][0]));
           }
-          //trendChart.series[0].data.push([ parseInt(thisStartTime + thisEndTime/2.), radonFactor*radonCnt/(thisEndTime - thisStartTime)]);
+          //trendChart.series[0].data.push([ parseInt(thisStartTime + thisEndTime/2.), parseFloat($("#radonFactor").val())*radonCnt/(thisEndTime - thisStartTime)]);
           
           //histChart.redraw();
           //trendChart.redraw();
